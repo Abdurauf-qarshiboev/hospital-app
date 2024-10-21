@@ -110,11 +110,11 @@ export default {
         },
         confirmText: {
             type: String,
-            default: "Confirm",
+            default: "Tasdiqlash",
         },
         cancelText: {
             type: String,
-            default: "Cancel",
+            default: "Bekor qilish",
         },
     },
     methods: {
