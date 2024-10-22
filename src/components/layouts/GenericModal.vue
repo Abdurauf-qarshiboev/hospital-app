@@ -85,14 +85,28 @@ export default {
             type: String,
             default: "Cancel",
         },
+        update: {
+            type: Object,
+            default: () => ({})
+        }
+    },
+    data: () => ({
+        data: {}
+    }),
+    watch: {
+        update(to) {
+            console.log(to);
+            this.data = { ...to }
+        }
     },
     methods: {
         close() {
-        this.$emit("close");
+            this.$emit("close");
+            this.data = {}
         },
         confirm() {
-        this.$emit("confirm");
-        this.close();
+            this.$emit("confirm",this.data);
+            this.close();
         },
     },
 };

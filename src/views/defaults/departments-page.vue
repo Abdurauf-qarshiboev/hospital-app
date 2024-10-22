@@ -18,23 +18,24 @@
     :open="show"
     title="Yangi bo'lim"
     @close="changeShow(false)"
-    @confirm="add"
+    @confirm="add(neW)"
     confirmText="Saqlash"
     cancelText="Bekor qilish"
+    :update="update"
   >
     <label for="title" class="block text-sm font-medium leading-6 text-gray-900">Bo'lim nomi</label>
     <input v-model="neW.title" id="title" name="title" type="text" required class="input" />
   </GenericModal>
 
-  <GenericTable :data="list" :columns="columns" @remove="remove" />
+  <GenericTable :data="list" :columns="columns" @remove="remove" @edit="edit"/>
   <notification :show="notif.show" :title="notif.title" :status="notif.status" @close="close"></notification>
   <!-- <alert
     :open="show"
-    title="Akkauntdan chiqish"
-    text="Rostdan ham akkauntdan chiqmoqchi ekanligingizni tasqiqlang! Tasdiqlash (Chiqish)ni bosing"
+    title="Bo`limni o`chirish"
+    text="Rostdan ham bo`limni o`chirmoqchi ekanligingizni tasqiqlang! Tasdiqlash (O`chirish)ni bosing."
     @close="changeShow(false)"
-    @confirm="quit"
-    confirmText="Chiqish"
+    @confirm="delete"
+    confirmText="O`chirish"
     cancelText="Bekor qilish"
   >
   </alert> -->
@@ -71,26 +72,48 @@ export default {
       { key: 'status', label: 'Holati' },
       { key: 'createdTime', label: 'Ochilgan vaqti' },
     ],
+    update: {}
   }),
   methods: {
+    async edit(id) {
+      const { data } = await api.get(`department/${id}`);
+      console.log(data);
+      this.update = { ...data }; 
+      console.log(this.update);
+      this.neW = this.update;
+      this.show = true; 
+    },
     changeShow(val) {
-      this.show = val;
+      this.show = val
+      if (!this.update) {
+        this.update = {}
+      }
     },
     // quit() {
     //   localStorage.removeItem('hospital_token');
-    //   this.$router.push({ name: 'logIn' });
+    //   this.$router.push({ name: 'logIn' })
     // },
-    async add() {
-      try {
-        const { data } = await api.post("department", this.neW);
-        this.list = [data, ...this.list];
-        this.showNotification("Yangi bo`lim qo`shildi!");
-        this.neW.title = '';
-      } catch (error) {
-        if (error.response?.data) {
-          this.showNotification(error.response.data,'exist');
-        } else {
-          this.showNotification("Muammo yuz berdi...",'exist');
+    async add(value) {
+      if (value?._id) {
+        const { data } = await api.put('department', value);
+        this.list = this.list.map(item => {
+          if (item._id == data._id) return data
+          return item
+        })
+        this.showNotification('Ma`lumotlar yangilandi','success');
+      }
+      else {
+        try {
+          const { data } = await api.post("department", this.neW);
+          this.list = [data, ...this.list];
+          this.showNotification("Yangi bo`lim qo`shildi!");
+          this.neW.title = ''
+        } catch (error) {
+          if (error.response?.data) {
+            this.showNotification(error.response.data,'exist')
+          } else {
+            this.showNotification("Muammo yuz berdi...",'exist')
+          }
         }
       }
     },
