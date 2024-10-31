@@ -10,21 +10,21 @@
                         {{ col.label }}
                     </th>
                     <th class="relative py-3.5 pl-1 pr-4 sm:pr-0">
-                        <span class="sr-only">Actio ns</span>
+                        <span class="sr-only">Actions</span>
                     </th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-                <tr v-for="item, index in departments" :key="item._id">
+                <tr v-for="item, index in rooms" :key="item._id">
                     <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
                         {{ index + 1 }}
                     </td>
                     <td v-for="(col, i) in columns" :key="i" class="whitespace-nowrap px-2 py-4 text-sm text-gray-500 text-center capitalize">
                         <template v-if="col.key == 'status'">
-                            <button @click="changeStatusDepartment({
-                                    _id: item._id,
-                                    status: item.status == 1 ? 0 : 1
-                                })"
+                            <button @click="changeStatusRoom({
+                                        _id: item._id,
+                                        status: item.status == 1 ? 0 : 1
+                                    })"
                                 :class="`btn ${item.status == 1 ? 'btn-success' : 'btn-warning'}`"
                             >
                                 {{ item.status == 1 ? 'Faol' : 'Nofaol' }}
@@ -53,17 +53,16 @@
         </div>
         </div>
     </div>
-    <el-confirm title="Bo`limni o`chirmoqchisiz?" text="O`chirilgan ma`lumotlar qayta tiklanmaydi."
+    <el-confirm title="Xonani o`chirmoqchisiz?" text="O`chirilgan ma`lumotlar qayta tiklanmaydi."
         @response="confirmRemove" />
 </template>
 <script>
 import { TrashIcon, PencilSquareIcon } from '@heroicons/vue/24/outline';
 import { mapActions, mapGetters } from 'vuex';
-
 export default {
     components: {
         TrashIcon,
-        PencilSquareIcon
+        PencilSquareIcon,
     },
     props: {
         columns: {
@@ -71,9 +70,9 @@ export default {
             required: true
         }
     },
-    data: () => ({
-        id: ''
-    }),
+    computed: {
+        ...mapGetters(['activeDepartments', 'rooms'])
+    },
     methods: {
         formatDate(givendate) {
             const date = new Date(givendate);
@@ -85,10 +84,10 @@ export default {
             
             return `${day}.${month}.${year} ${hours}:${minutes}`;
         },
-        ...mapActions(['allDepartments', 'changeStatusDepartment', 'removeDepartment']),
+        ...mapActions(['allRooms', 'removeRoom', 'changeStatusRoom', 'allDepartments']),
         async confirmRemove(value) {
             if (value) {
-                await this.removeDepartment(this.id)
+                await this.removeRoom(this.id)
                 this.id = ''
             }
         },
@@ -104,10 +103,8 @@ export default {
             this.$store.commit('setConfirmToggle', true)
         }
     },
-    computed: {
-        ...mapGetters(['departments', 'activeDepartments'])
-    },
     async mounted() {
+        await this.allRooms()
         await this.allDepartments()
     }
 }

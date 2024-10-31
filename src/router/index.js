@@ -1,4 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { navMenu } from "@/helpers/navMenu";
+import { createRouter, createWebHistory } from "vue-router";
+import { store } from "@/store";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -7,25 +10,14 @@ const router = createRouter({
       name: "defaultLayout",
       component: () => import("@/layouts/defaultLayout.vue"),
       children: [
+        ...navMenu,
         {
-          path: '',
-          name: 'homepage',
-          component: () => import('@/views/defaults/dashboard-page.vue')
-        },
-        {
-          path: 'departments',
-          name: 'departments',
-          component: () => import('@/views/defaults/departments-page.vue')
-        },
-        {
-          path: 'specs',
-          name: 'specs',
-          component: () => import('@/views/defaults/specs-page.vue')
-        },
-        {
-          path: 'positions',
-          name: 'positions',
-          component: () => import('@/views/defaults/positions-page.vue')
+          path: "doctor/:id",
+          name: "doctor-show",
+          component: () => import("@/views/defaults/doctorProfile.vue"),
+          meta: {
+            title: "Shifokor profili",
+          },
         },
       ],
     },
@@ -36,17 +28,56 @@ const router = createRouter({
       children: [
         {
           path: "signup",
-          name: "signUp",
+          name: "signup",
           component: () => import("@/views/auth/signUp-page.vue"),
         },
         {
           path: "",
-          name: "logIn",
+          name: "login",
           component: () => import("@/views/auth/logIn-page.vue"),
         },
       ],
     },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "error",
+      component: () => import("@/views/defaults/errorPage.vue"),
+    },
   ],
 });
 
-export default router
+router.beforeEach(async (to, from, next) => {
+  document.title = `Hospital | ${to.meta?.title || "Sahifa"}`;
+
+  console.log("Navigating to:", to.name);
+  console.log("Current auth state:", store.state.auth.isAuth); // Log the auth state
+
+  if (
+    ["login", "signup", "authLayout"].includes(to.name) ||
+    store.state.auth.isAuth
+  ) {
+    next();
+  } else {
+    if ($cookies.isKey("hospital_token")) {
+      console.log("Token found, checking user status...");
+      try {
+        await store.dispatch("checkUser");
+        console.log("Current auth state after checkUser:", store.state.auth.isAuth); // Log again after checkUser
+        if (store.state.auth.isAuth) {
+          next();
+        } else {
+          next({ name: "login" });
+        }
+      } catch (error) {
+        console.error("Failed to check user:", error);
+        next({ name: "login" });
+      }
+    } else {
+      next({ name: "login" });
+    }
+  }
+});
+
+
+
+export default router;

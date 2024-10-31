@@ -1,5 +1,5 @@
 <template>
-<el-dialog>
+  <el-dialog>
         <DialogPanel
             class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
             <div>
@@ -7,7 +7,15 @@
                     <DialogTitle as="h3" class="text-lg  font-semibold leading-6 text-gray-900">Yangi
                         bo'lim</DialogTitle>
                     <div class="mt-2">
-                        <el-input v-model="data.title" label="Bo`lim nomi" name="department" />
+                        <el-input label="Xona raqami" name="number" type="number" v-model="data.number" />
+                    </div>
+                    <div class="mt-2">
+                        <el-input v-model="data.maxcount" type="number" name="number" label="Xona sigimi" />
+                    </div>
+                    <div class="mt-2">
+                        <el-select v-model="data.department" name="department" label="Bo`lim" :list="activeDepartments"
+                            fieldName="_id" labelName="title" />
+
                     </div>
                 </div>
             </div>
@@ -22,55 +30,58 @@
         </DialogPanel>
     </el-dialog>
 </template>
-
 <script>
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { CheckIcon } from '@heroicons/vue/24/outline'
-import { mapActions } from 'vuex';
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  TransitionChild,
+  TransitionRoot,
+} from "@headlessui/vue";
+import { CheckIcon } from "@heroicons/vue/24/outline";
+import { mapGetters, mapActions } from 'vuex';
 export default {
-    components: {
-        Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot, CheckIcon
+  components: {
+    Dialog,
+    DialogPanel,
+    DialogTitle,
+    TransitionChild,
+    TransitionRoot,
+    CheckIcon,
+  },
+  computed: {
+        ...mapGetters(['activeDepartments', 'toggle', 'id', 'editToggle'])
     },
     data: () => ({
         data: {}
     }),
-    computed: {
-        toggle() {
-            return this.$store.getters.toggle
-        },
-        id() {
-            return this.$store.getters.id
-        },
-        editToggle() {
-            return this.$store.getters.editToggle
-        }
-    },
     watch: {
         async toggle(to) {
             if (to && this.id?.length > 0 && this.editToggle) {
-                await this.getTheDepartment(this.id)
+                await this.getTheRoom(this.id)
             } else {
                 this.data = {}
             }
         }
     },
     methods: {
-        ...mapActions(['newDepartment', 'getDepartment', 'saveDepartment']),
+        ...mapActions(['newRoom', 'getRoom', 'saveRoom']),
         close() {
             this.$store.commit('setToggle', false)
         },
-        async getTheDepartment(id) {
-            const res = await this.getDepartment(id)
+        async getTheRoom(id) {
+            const res = await this.getRoom(id)
             this.data = { ...res.data }
         },
         add() {
             if (this.editToggle) {
-                this.saveDepartment(this.data)
+                this.saveRoom(this.data)
             } else {
-                this.newDepartment(this.data)
+                this.newRoom(this.data)
             }
             this.close()
         }
-    },
-}
+    }
+};
 </script>
+<style></style>

@@ -10,7 +10,7 @@ import {
 export const navMenu = [
   {
     path: "",
-    name: "homepage",
+    name: "dashboard-page",
     component: () => import("@/views/defaults/dashboard-page.vue"),
     meta: {
       title: "Bosh sahifa",
@@ -24,6 +24,15 @@ export const navMenu = [
     meta: {
       title: "Bo`limlar",
       icon: RectangleGroupIcon,
+    },
+  },
+  {
+    path: "rooms",
+    name: "rooms",
+    component: () => import("@/views/defaults/rooms-page.vue"),
+    meta: {
+      title: "Xonalar",
+      icon: RectangleStackIcon,
     },
   },
   {
@@ -45,12 +54,12 @@ export const navMenu = [
     },
   },
   {
-    path: "rooms",
-    name: "rooms",
-    component: () => import("@/views/defaults/rooms-page.vue"),
+    path: "doctors",
+    name: "doctors",
+    component: () => import("@/views/defaults/doctors-page.vue"),
     meta: {
-      title: "Xonalar",
-      icon: RectangleStackIcon,
+      title: "Shifokorlar",
+      icon: UsersIcon,
     },
   },
 ];

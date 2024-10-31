@@ -1,13 +1,14 @@
 <template>
-<el-dialog>
+    <el-dialog>
         <DialogPanel
             class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
             <div>
                 <div>
-                    <DialogTitle as="h3" class="text-lg  font-semibold leading-6 text-gray-900">Yangi
-                        bo'lim</DialogTitle>
+                    <DialogTitle as="h3" class="text-lg  font-semibold leading-6 text-gray-900">
+                        {{ editToggle ? 'Mutaxassislikni tahrirlash' : 'Yangi mutaxassislik' }}
+                    </DialogTitle>
                     <div class="mt-2">
-                        <el-input v-model="data.title" label="Bo`lim nomi" name="department" />
+                        <el-input v-model="data.title" label="Mutaxassislik nomi" name="spec" />
                     </div>
                 </div>
             </div>
@@ -22,11 +23,10 @@
         </DialogPanel>
     </el-dialog>
 </template>
-
 <script>
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { CheckIcon } from '@heroicons/vue/24/outline'
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 export default {
     components: {
         Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot, CheckIcon
@@ -35,39 +35,31 @@ export default {
         data: {}
     }),
     computed: {
-        toggle() {
-            return this.$store.getters.toggle
-        },
-        id() {
-            return this.$store.getters.id
-        },
-        editToggle() {
-            return this.$store.getters.editToggle
-        }
+        ...mapGetters(['toggle','id','editToggle']),
     },
     watch: {
         async toggle(to) {
             if (to && this.id?.length > 0 && this.editToggle) {
-                await this.getTheDepartment(this.id)
+                await this.getTheSpec(this.id)
             } else {
                 this.data = {}
             }
         }
     },
     methods: {
-        ...mapActions(['newDepartment', 'getDepartment', 'saveDepartment']),
+        ...mapActions(['newSpec', 'getSpec', 'saveSpec']),
         close() {
             this.$store.commit('setToggle', false)
         },
-        async getTheDepartment(id) {
-            const res = await this.getDepartment(id)
+        async getTheSpec(id) {
+            const res = await this.getSpec(id)
             this.data = { ...res.data }
         },
         add() {
             if (this.editToggle) {
-                this.saveDepartment(this.data)
+                this.saveSpec(this.data)
             } else {
-                this.newDepartment(this.data)
+                this.newSpec(this.data)
             }
             this.close()
         }
