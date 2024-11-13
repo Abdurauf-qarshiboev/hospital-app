@@ -1,5 +1,4 @@
 import {
-    Cog6ToothIcon,
     RectangleStackIcon,
     HomeIcon,
     UsersIcon,
