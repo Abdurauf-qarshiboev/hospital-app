@@ -68,6 +68,7 @@ export const auth = {
         router.push({ name: "login" });
       }
     },
+    
     logout({ commit }) {
       $cookies.remove("hospital_token");
       commit("setIsAuth", false);
